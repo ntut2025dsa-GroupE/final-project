@@ -1,0 +1,219 @@
+/* ===== Inventory Page Styles ===== */
+.inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.inventory-header h1 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.inventory-actions {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    gap: var(--space-sm);
+    min-width: 300px;
+}
+
+.search-input {
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-color);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--secondary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Buttons */
+.btn-add {
+    background-color: var(--success-color);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.btn-add:hover {
+    background-color: #219653;
+}
+
+.btn-search {
+    background-color: var(--secondary-color);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.btn-edit,
+.btn-delete {
+    color: #000000;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    padding: var(--space-xs);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit:hover,
+.btn-delete:hover {
+    background-color: #f0f0f0;
+}
+
+/* Inventory Table */
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.inventory-table th {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: var(--space-md);
+    text-align: left;
+    position: sticky;
+    top: 0;
+}
+
+.inventory-table td {
+    padding: var(--space-md);
+    border-bottom: 1px solid #eee;
+}
+
+.inventory-table tr:last-child td {
+    border-bottom: none;
+}
+
+.inventory-table tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Table Cells */
+.quantity-cell {
+    font-weight: 600;
+}
+
+.cost-cell {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.reorder-cell {
+    font-weight: 500;
+}
+
+.critical-cell {
+    font-weight: 500;
+}
+
+/* Item Link */
+.item-link {
+    color: var(--secondary-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    transition: color 0.2s ease;
+}
+
+.item-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* Sort Links */
+.sort-link {
+    color: rgba(255, 255, 255, 0.7);
+    margin-left: var(--space-xs);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.sort-link:hover {
+    color: white;
+}
+
+/* Low Stock Warning */
+.critical {
+    background-color: rgba(231, 76, 60, 0.1);
+    border-left: 4px solid var(--warning-red);
+}
+
+.critical .quantity-cell {
+    color: var(--warning-red);
+}
+
+
+/* High Stock Warning */
+.reorder {
+    background-color: rgba(241, 196, 15, 0.1);
+    border-left: 4px solid var(--warning-yellow);
+}
+
+.reorder .quantity-cell {
+    color: var(--warning-yellow);
+}
+
+/* No Items */
+.no-items td {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--gray-color);
+}
+
+.no-items i {
+    margin-right: var(--space-sm);
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .inventory-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .inventory-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .search-form {
+        width: 100%;
+    }
+    
+    .inventory-table {
+        display: block;
+        overflow-x: auto;
+    }
+}

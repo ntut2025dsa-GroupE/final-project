@@ -1,0 +1,615 @@
+/* 原有的 box 樣式保留 */
+.box {
+    width: 100%;
+    height: 400px;
+    margin: 5px;
+    top: 10px;
+    background-color: #f0f0f0;
+    float: left;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 頁面標題樣式 */
+/* h1 {
+    text-align: center;
+    color: #333;
+    margin: 30px 0;
+    font-size: 2.5em;
+    font-weight: 600;
+} */
+
+/* 主要容器 */
+.carousel-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto 50px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* 圖片展示區域 */
+.carousel-viewport {
+    position: relative;
+    height: 350px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    height: 100%;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+/* 單個圖片項目 */
+.carousel-item {
+    min-width: 250px;
+    width: 250px;
+    height: 300px;
+    position: relative;
+    margin-right: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+    transform: scale(1);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.carousel-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+}
+
+.carousel-item:last-child {
+    margin-right: 0;
+}
+
+/* 圖片樣式 */
+.item-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.carousel-item:hover .item-image {
+    transform: scale(1.05);
+}
+
+/* 圖片名稱 */
+.item-name {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+    color: white;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    z-index: 2;
+    border-radius: 12px 12px 0 0;
+}
+
+/* 無圖片狀態 */
+.no-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #6c757d;
+    border: 2px dashed #dee2e6;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.no-image-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.6;
+    animation: pulse 2s infinite;
+}
+
+.no-image p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.3; }
+}
+
+/* 導航按鈕 */
+.nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.95);
+    border: none;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 22px;
+    color: #333;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+
+.nav-button:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+    color: #667eea;
+}
+
+.nav-button:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.nav-button.prev {
+    left: 25px;
+}
+
+.nav-button.next {
+    right: 25px;
+}
+
+/* 控制面板 */
+.control-panel {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+/* 資訊顯示 */
+.info-display {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 16px;
+    color: #495057;
+    font-weight: 500;
+}
+
+.current-info {
+    background: #667eea;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#currentItemName {
+    font-weight: 600;
+    color: #333;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 指示器 */
+.indicators {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #dee2e6;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator:hover {
+    background: #adb5bd;
+    transform: scale(1.2);
+}
+
+.indicator.active {
+    background: #667eea;
+    transform: scale(1.3);
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
+}
+
+/* 自動播放按鈕 */
+.auto-play-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.auto-play-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.auto-play-btn.paused {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.auto-play-btn:active {
+    transform: translateY(0);
+}
+
+/* 存貨統計區塊 */
+.inventory-stats {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.stats-header {
+    padding: 25px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.stats-header h2 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+.stats-header p {
+    margin: 8px 0 0;
+    opacity: 0.9;
+    font-size: 14px;
+}
+
+.stats-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 30px;
+}
+
+/* 圓餅圖容器 */
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.chart-wrapper {
+    width: 300px;
+    height: 300px;
+    position: relative;
+}
+
+.empty-chart {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    border-radius: 12px;
+    color: #6c757d;
+}
+
+.empty-chart-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    max-width: 100%;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 14px;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.legend-text {
+    margin-right: 8px;
+    font-weight: 500;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+}
+
+.legend-value {
+    font-weight: 600;
+    color: #495057;
+}
+
+/* 統計信息 */
+.stats-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stat-item {
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.stat-item h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stat-value {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: #667eea;
+    margin: 5px 0;
+}
+
+.stat-description {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/* 載入動畫 */
+.carousel-item {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(0.95);
+    }
+}
+
+/* 滾動條樣式 */
+.carousel-viewport::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-viewport {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* 響應式設計 */
+@media (max-width: 1024px) {
+    .carousel-container {
+        max-width: 95%;
+    }
+    
+    .carousel-item {
+        min-width: 220px;
+        width: 220px;
+    }
+    
+    .inventory-stats {
+        max-width: 95%;
+    }
+    
+    .stats-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .chart-wrapper {
+        width: 250px;
+        height: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2em;
+        margin: 20px 0;
+    }
+    
+    .carousel-container {
+        max-width: 100%;
+        margin: 0 10px 30px 10px;
+        border-radius: 10px;
+    }
+    
+    .carousel-viewport {
+        height: 320px;
+    }
+    
+    .carousel-track {
+        padding: 20px 15px;
+    }
+    
+    .carousel-item {
+        min-width: 200px;
+        width: 200px;
+        height: 280px;
+    }
+    
+    .item-image {
+        height: 180px;
+    }
+    
+    .no-image {
+        height: 180px;
+    }
+    
+    .nav-button {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .nav-button.prev {
+        left: 15px;
+    }
+    
+    .nav-button.next {
+        right: 15px;
+    }
+    
+    .control-panel {
+        padding: 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .info-display {
+        order: 2;
+    }
+    
+    .indicators {
+        order: 1;
+    }
+    
+    .auto-play-btn {
+        order: 3;
+        padding: 10px 20px;
+    }
+    
+    /* 存貨統計響應式 */
+    .inventory-stats {
+        margin: 30px 10px;
+    }
+    
+    .stats-header {
+        padding: 20px;
+    }
+    
+    .stats-header h2 {
+        font-size: 1.5em;
+    }
+    
+    .stats-content {
+        padding: 30px 20px;
+        gap: 25px;
+    }
+    
+    .chart-container {
+        height: 350px;
+    }
+    
+    .chart-wrapper {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .stat-item {
+        padding: 15px;
+    }
+    
+    .stat-value {
+        font-size: 1.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-item {
+        min-width: 180px;
+        width: 180px;
+        height: 250px;
+    }
+    
+    .item-image {
+        height: 160px;
+    }
+    
+    .no-image {
+        height: 160px;
+    }
+    
+    .item-name {
+        font-size: 14px;
+        padding: 15px 10px 10px 10px;
+    }
+    
+    #currentItemName {
+        max-width: 150px;
+    }
+    
+    .stats-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .legend-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px;
+    }
+    
+    .legend-text {
+        max-width: 150px;
+    }
+}

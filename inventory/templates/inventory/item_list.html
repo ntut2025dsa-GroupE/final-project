@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}
+Inventory List
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'inventory:item_create' %}" class="btn btn-add">Add Item</a>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/inventory.css' %}">
+
+<div class="inventory-header">
+    <div class="inventory-actions">
+        <form method="get" action="" class="search-form">
+            <input type="text" name="query" value="{{ query|default_if_none:'' }}" 
+                   placeholder="Search by anything..." class="search-input">
+            <button type="submit" class="btn btn-search">Search</button>            
+        </form>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="inventory-table">
+        <thead>
+            <tr>
+                <th class="sortable">
+                    Name 
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=name" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-name" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Category
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=category" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-category" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Current Quantity
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=total_quantity" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-total_quantity" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Avg Cost
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=weighted_avg_cost" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-weighted_avg_cost" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Reorder Point
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=reorder_point" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-reorder_point" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Critical Point
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=critical_point" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-critical_point" class="sort-link">↓</a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr class="inventory-item {{ item.level }}">
+                <td>
+                    <a href="{% url 'inventory:item_detail' item.pk %}" class="item-link">{{ item.name }}</a>
+                </td>
+                <td>{{ item.get_category_display|default:"-" }}</td>
+                <td class="quantity-cell">{{ item.total_quantity|default:"0" }}</td>
+                <td class="cost-cell">${{ item.weighted_avg_cost|floatformat:2 }}</td>
+                <td class="reorder-cell">{{ item.reorder_point }}</td>
+                <td class="critical-cell">{{ item.critical_point }}</td>
+                <td class="actions-cell">
+                    <a href="{% url 'inventory:item_update' item.pk %}" class="btn-edit"><i class="bi bi-pencil-fill"></i></a>                 
+                    <a href="{% url 'inventory:item_delete' item.pk %}" class="btn-delete"><i class="bi bi-trash-fill"></i></a>   
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="no-items">
+                <td colspan="7">
+                    No items found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

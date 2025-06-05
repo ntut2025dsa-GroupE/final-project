@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+
+<div class="form-container">
+    <h1 class="form-title">Add Stock-in Records</h1>
+
+    <form method="post" class="stockin-form">
+        {% csrf_token %}
+        
+        <!-- 主表單字段 -->
+        <div class="form-card">
+            {% for field in form %}
+                {% if field.name != 'x' %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-help">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="form-error">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-save">Add</button>            
+            <a href="{% url 'inventory:item_detail' item.pk %}" class="btn btn-back">Back</a>            
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}
+Inventory Alerts
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/alerts.css' %}">
+
+<div class="alerts-container">
+    <!-- Low Stock Alerts Section -->
+    <section class="alert-section">
+        <h1>Low Stock Alerts</h1>
+        
+        {% if alerts %}
+        <table class="alert-table">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Current Quantity</th>
+                    <th>Reorder Point</th>
+                    <th>Critical Point</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in alerts %}
+                    {% if item.alert_level != 'normal' %}
+                    <tr class="alert-{{ item.alert_level }}">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.total_quantity }}</td>
+                        <td>{{ item.reorder_point }}</td>
+                        <td>{{ item.critical_point }}</td>
+                        <td>
+                            <span class="status-badge status-{{ item.alert_level }}">
+                                {% if item.alert_level == 'reorder' %}
+                                    Warning
+                                {% elif item.alert_level == 'critical' %}
+                                    Critical
+                                {% endif %}
+                            </span>
+                        </td>   
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-alerts">
+            All items are above reorder point
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Expired Stock Section -->
+    <section class="alert-section">
+        <h1>Expired Stock</h1>
+        
+        <table class="alert-table">
+            <thead>
+                <tr>
+                    <th>Stock-in Date</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Expiry Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in expired_stockins %}
+                <tr class="expired-item">
+                    <td>{{ record.created_at|date:"Y-m-d" }}</td>
+                    <td>{{ record.item.name }}</td>
+                    <td>{{ record.quantity }}</td>
+                    <td>{{ record.expiry_date|date:"Y-m-d" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="no-alerts">
+                        No expired items found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+
+{% endblock %}
+
+{% block content2 %}
+<div class="additional-content">
+    <h3>Alert Guidelines</h3>
+    <ul>
+        <li><span class="status-badge status-reorder">Warning</span> - Consider reordering soon</li>
+        <li><span class="status-badge status-critical">Critical</span> - Urgent reorder needed</li>
+        <li><span style="color: var(--danger-color);">Expired</span> - Not for sale</li>
+    </ul>
+</div>
+{% endblock %}

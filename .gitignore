@@ -1,0 +1,30 @@
+@"
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Django
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.env
+local_settings.py
+
+# Virtual Environments
+env/
+venv/
+ENV/
+VENV/
+
+# VSCode or PyCharm
+.vscode/
+.idea/
+
+# Migrations
+**/migrations/*.py
+!**/migrations/__init__.py
+"@ | Out-File -Encoding utf8 .gitignore

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+
+<div class="form-container">
+    <h1 class="form-title">Add New Transaction</h1>
+
+    <form method="post" class="add-transaction-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- 主表單字段 -->
+        <div class="form-card">
+            <div class="form-group {% if form.item.errors %}has-error{% endif %}">
+                {{ form.item.label_tag }}
+                {{ form.item }}
+                {% if form.item.help_text %}
+                    <small class="form-help">{{ form.item.help_text }}</small>
+                {% endif %}
+                {% if form.item.errors %}
+                    <div class="form-error">{{ form.item.errors }}</div>
+                {% endif %}
+            </div>
+                
+            <div class="form-group">
+                <label>Total Quantity:</label>
+                <div id="tq-display" class="form-control-plaintext bg-light p-2 rounded">
+                    <span id="tq-value">N/A</span>
+                </div>
+            </div>
+
+            <div class="form-group {% if form.quantity.errors %}has-error{% endif %}">
+                {{ form.quantity.label_tag }}
+                {{ form.quantity }}
+                {% if form.quantity.help_text %}
+                    <small class="form-help">{{ form.quantity.help_text }}</small>
+                {% endif %}
+                {% if form.quantity.errors %}
+                    <div class="form-error">{{ form.quantity.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label>Average Cost:</label>
+                <div id="wac-display" class="form-control-plaintext bg-light p-2 rounded">
+                    <span id="wac-value">N/A</span>
+                </div>
+            </div>
+
+            <div class="form-group {% if form.unitprice.errors %}has-error{% endif %}">
+                {{ form.unitprice.label_tag }}
+                {{ form.unitprice }}
+                {% if form.unitprice.help_text %}
+                    <small class="form-help">{{ form.unitprice.help_text }}</small>
+                {% endif %}
+                {% if form.unitprice.errors %}
+                    <div class="form-error">{{ form.unitprice.errors }}</div>
+                {% endif %}
+            </div>
+
+
+            <div class="form-group {% if form.demander.errors %}has-error{% endif %}">
+                {{ form.demander.label_tag }}
+                {{ form.demander }}
+                {% if form.Demander.help_text %}
+                    <small class="form-help">{{ form.demander.help_text }}</small>
+                {% endif %}
+                {% if form.demander.errors %}
+                    <div class="form-error">{{ form.demander.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group {% if form.notes.errors %}has-error{% endif %}">
+                {{ form.notes.label_tag }}
+                {{ form.notes }}
+                {% if form.notes.help_text %}
+                    <small class="form-help">{{ form.notes.help_text }}</small>
+                {% endif %}
+                {% if form.notes.errors %}
+                    <div class="form-error">{{ form.notes.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-save">Save</button>
+            <a href="{% url 'transactions:transaction_list' %}" class="btn btn-back">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="priceWarningModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    Price Warning
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>⚠️ You are selling below the weighted average cost!</p>
+                <div class="alert alert-warning mt-3"> 
+                    This may result in a loss. Are you sure you want to proceed?
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmSubmit" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 更新加權平均成本顯示
+    function updateWACandTQ() {
+        const itemSelect = document.getElementById('id_item');
+        if (!itemSelect) return;
+        
+        const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+        const wac = selectedOption.getAttribute('data-wac'); // 直接讀取 option 的屬性
+        const tq = selectedOption.getAttribute('data-tq'); // 直接讀取 option 的屬性
+        
+        document.getElementById('wac-value').textContent = wac ? `$${wac}` : 'N/A';
+        document.getElementById('tq-value').textContent = tq ? tq : 'N/A';
+    }
+
+    // 初始化監聽
+    const itemSelect = document.getElementById('id_item');
+    if (itemSelect) {
+        itemSelect.addEventListener('change', updateWACandTQ);
+        updateWACandTQ(); // 初始載入時更新
+    }
+
+    // 價格檢查
+    const form = document.querySelector('.add-transaction-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const unitprice = parseFloat(document.getElementById('id_unitprice').value);
+            const itemSelect = document.getElementById('id_item');
+            const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+            const weightedAvgCost = parseFloat(selectedOption.getAttribute('data-wac'));
+
+            if (unitprice < weightedAvgCost) {
+                e.preventDefault();
+                const warningModal = new bootstrap.Modal(document.getElementById('priceWarningModal'));
+                document.getElementById('confirmSubmit').onclick = function() {
+                    form.submit();
+                };
+                warningModal.show();
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+

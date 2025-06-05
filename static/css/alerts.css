@@ -1,0 +1,124 @@
+/* ===== Alerts Page Styles ===== */
+
+.alerts-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+}
+
+.alert-section {
+    background-color: white;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-lg);
+}
+
+.alert-section h1 {
+    color: var(--warning-red);
+    font-size: 1.5rem;
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Alert Tables */
+.alert-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-md) 0;
+}
+
+.alert-table th {
+    background-color: var(--warning-red);
+    color: white;
+    padding: var(--space-md);
+    text-align: left;
+    position: sticky;
+    top: 0;
+}
+
+.alert-table td {
+    padding: var(--space-md);
+    border-bottom: 1px solid #eee;
+}
+
+.alert-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Alert Level Styles */
+.alert-reorder {
+    background-color: #fffde7;
+    border-left: 4px solid var(--warning-yellow);
+}
+
+
+.alert-critical {
+    background-color: #ffebee;
+    border-left: 4px solid var(--warning-red);
+    font-weight: bold;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-reorder {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+
+
+.status-critical {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Expired Items */
+.expired-item {
+    background-color: #ffebee;
+}
+
+.expired-item td {
+    border-color: #ffcdd2;
+}
+
+/* No Alerts Message */
+.no-alerts {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--success-color);
+    font-size: 1.1rem;
+}
+
+.no-alerts i {
+    margin-right: var(--space-sm);
+}
+
+/* Additional Content */
+.additional-content {
+    margin-top: var(--space-xl);
+    padding: var(--space-md);
+    background-color: #f8f9fa;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--secondary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .alert-table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    .alert-section h1 {
+        font-size: 1.3rem;
+    }
+}

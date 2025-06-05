@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}
+<i class="fas fa-box-open"></i> {{ item.name }} ({{ item.category }})
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'inventory:stock_in_records' %}?item_id={{ item.id }}" class="btn btn-primary">Add Stock Record</a>
+
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/inventory_detail.css' %}">
+
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i> Rows in red indicate expired items that cannot be sold!
+</div>
+
+<div class="table-container">
+    <table class="item-detail-table">
+        <thead>
+            <tr>
+                <th class="sortable">
+                    Serial #
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=serial_number" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-serial_number" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Stock-in Date
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=created_at" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-created_at" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Unit Cost
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=unitcost" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-unitcost" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Quantity
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=quantity" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-quantity" class="sort-link">↓</a>
+                </th>
+                <th>Last Vendor</th>
+                <th class="sortable">
+                    Expiry Date
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=expiry_date" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-expiry_date" class="sort-link">↓</a>
+                </th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in stockins %}
+            <tr class="{% if record.expiry_date and record.expiry_date < today %}expired{% endif %}">
+                <td>{{ record.serial_number }}</td>
+                <td>{{ record.created_at|date:"Y-m-d" }}</td>
+                <td class="cost-cell">${{ record.unitcost }}</td>
+                <td class="quantity-cell">{{ record.quantity }}</td>
+                <td>{{ record.last_vendor|default:"-" }}</td>
+                <td class="{% if record.expiry_date and record.expiry_date < today %}expiry-warning{% endif %}">
+                    {{ record.expiry_date|date:"Y-m-d"|default:"-" }}
+                </td>
+                <td class="actions-cell">
+                    <a href="{% url 'inventory:stockin_update' record.pk %}" class="btn-edit"><i class="bi bi-pencil-fill"></i></a>                 
+                    <a href="{% url 'inventory:stockin_delete' record.pk %}" class="btn-delete"><i class="bi bi-trash-fill"></i></a>   
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="no-records">
+                <td colspan="7">
+                    No stock records found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="back-link">
+    <a href="{% url 'inventory:item_list' %}" class="btn btn-secondary">Back to Inventory</a>
+</div>
+{% endblock %}

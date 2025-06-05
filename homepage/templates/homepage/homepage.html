@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}
+Inventory Overview
+{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+
+
+<div class="carousel-container">
+    <div class="carousel-viewport">
+        <div class="carousel-track">
+            {% for item in items %}
+                <div class="carousel-item">
+                    <div class="item-name">{{ item.name }}</div>
+                    {% if item.image %}
+                        <img src="{{ item.image.url }}" class="item-image" alt="{{ item.name }}"onerror="handleImageError(this)">
+                    {% else %}
+                        <div class="no-image">
+                            <div class="no-image-icon">📷</div>
+                            <p>No Image</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="carousel-item">
+                    <div class="item-name">No Items</div>
+                    <div class="no-image">
+                        <div class="no-image-icon">📦</div>
+                        <p>Currently no items</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- 導航按鈕 -->
+    <button class="nav-button prev" onclick="carousel.prev()">❮</button>
+    <button class="nav-button next" onclick="carousel.next()">❯</button>
+    
+    <!-- 控制面板 -->
+    <div class="control-panel">
+        <div class="info-display">
+            <span class="current-info" id="currentInfo">1 / {{ items|length|default:1 }}</span>
+            <span>|</span>
+            <span id="currentItemName">
+                {% if items %}{{ items.0.name }}{% else %}No Items{% endif %}
+            </span>
+        </div>
+        
+        <div class="indicators" id="indicators"></div>
+        
+        {% if items|length > 1 %}
+        <button class="auto-play-btn" id="autoPlayBtn" onclick="carousel.toggleAutoPlay()">
+            Auto Play
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 其他內容保持不變 -->
+<!-- {% if form %}
+<div class="box">
+    <h3>新增項目</h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">新增</button>
+    </form>
+</div>
+{% endif %} -->
+
+<div class="inventory-stats">
+    <div class="stats-header">
+        <h2>📊 Inventory Statistics</h2>
+        <p>Item quantity distribution and stock status</p>
+    </div>
+    
+    <div class="stats-content">
+        <!-- 圓餅圖 -->
+        <div class="chart-container">
+            {% if items %}
+                <div class="chart-wrapper">
+                    <canvas id="inventoryChart"></canvas>
+                </div>
+                <div class="chart-legend" id="chartLegend">
+                    <!-- 圖例將由 JavaScript 動態生成 -->
+                </div>
+            {% else %}
+                <div class="empty-chart">
+                    <div class="empty-chart-icon">📈</div>
+                    <h3>No Data</h3>
+                    <p>No inventory data available</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 統計信息 -->
+        <div class="stats-info">
+            <div class="stat-item">
+                <h3>📦 Total Quantity</h3>
+                <div class="stat-value" id="totalQuantity">0</div>
+                <p class="stat-description">Total quantity of all items</p>
+            </div>
+            
+            <div class="stat-item">
+                <h3>🏷️ Items With Images</h3>
+                <div class="stat-value" id="itemsWithImages">0</div>
+                <p class="stat-description">Number of items with images</p>
+            </div>
+            
+            <div class="stat-item">
+                <h3>📷 Items Without Images</h3>
+                <div class="stat-value" id="itemsWithoutImages">0</div>
+                <p class="stat-description">Number of items without images</p>
+            </div>
+            
+            <div class="stat-item">
+                <h3>📊 Completion Rate</h3>
+                <div class="stat-value" id="completionRate">0%</div>
+                <p class="stat-description">Percentage of complete item data</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+class HorizontalCarousel {
+    constructor() {
+        this.track = document.querySelector('.carousel-track');
+        this.items = document.querySelectorAll('.carousel-item');
+        this.indicators = document.getElementById('indicators');
+        this.currentInfo = document.getElementById('currentInfo');
+        this.currentItemName = document.getElementById('currentItemName');
+        this.autoPlayBtn = document.getElementById('autoPlayBtn');
+        
+        this.currentIndex = 0;
+        this.totalItems = this.items.length;
+        this.itemWidth = 270; // 250px + 20px margin
+        this.visibleItems = this.calculateVisibleItems();
+        this.isAutoPlaying = false;
+        this.autoPlayInterval = null;
+        
+        // 如果只有一個項目，不需要初始化輪播功能
+        if (this.totalItems <= 1) {
+            this.hideControls();
+            return;
+        }
+        
+        this.init();
+    }
+    
+    hideControls() {
+        const navButtons = document.querySelectorAll('.nav-button');
+        navButtons.forEach(btn => btn.style.display = 'none');
+        
+        if (this.autoPlayBtn) {
+            this.autoPlayBtn.style.display = 'none';
+        }
+    }
+    
+    init() {
+        this.createIndicators();
+        this.updateDisplay();
+        this.setupEventListeners();
+        this.updateLayout();
+    }
+    
+    calculateVisibleItems() {
+        const containerWidth = document.querySelector('.carousel-viewport').offsetWidth;
+        return Math.floor(containerWidth / this.itemWidth);
+    }
+    
+    createIndicators() {
+        this.indicators.innerHTML = '';
+        for (let i = 0; i < this.totalItems; i++) {
+            const indicator = document.createElement('div');
+            indicator.className = 'indicator';
+            if (i === 0) indicator.classList.add('active');
+            indicator.addEventListener('click', () => this.goToSlide(i));
+            this.indicators.appendChild(indicator);
+        }
+    }
+    
+    setupEventListeners() {
+        // 鍵盤控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') this.prev();
+            if (e.key === 'ArrowRight') this.next();
+            if (e.key === ' ') {
+                e.preventDefault();
+                this.toggleAutoPlay();
+            }
+        });
+        
+        // 響應式調整
+        window.addEventListener('resize', () => {
+            this.visibleItems = this.calculateVisibleItems();
+            this.updateLayout();
+        });
+        
+        // 滑鼠懸停暫停自動播放
+        const container = document.querySelector('.carousel-container');
+        container.addEventListener('mouseenter', () => {
+            if (this.isAutoPlaying) this.pauseAutoPlay();
+        });
+        
+        container.addEventListener('mouseleave', () => {
+            if (this.isAutoPlaying) this.resumeAutoPlay();
+        });
+    }
+    
+    updateLayout() {
+        const translateX = -this.currentIndex * this.itemWidth;
+        this.track.style.transform = `translateX(${translateX}px)`;
+    }
+    
+    updateDisplay() {
+        // 更新指示器
+        const indicators = this.indicators.querySelectorAll('.indicator');
+        indicators.forEach((indicator, index) => {
+            indicator.classList.toggle('active', index === this.currentIndex);
+        });
+        
+        // 更新資訊顯示
+        this.currentInfo.textContent = `${this.currentIndex + 1} / ${this.totalItems}`;
+        
+        // 更新當前物品名稱
+        const currentItem = this.items[this.currentIndex];
+        const itemName = currentItem.querySelector('.item-name').textContent;
+        this.currentItemName.textContent = itemName;
+    }
+    
+    goToSlide(index) {
+        this.currentIndex = index;
+        this.updateLayout();
+        this.updateDisplay();
+    }
+    
+    next() {
+        // 循環到第一張
+        this.currentIndex = (this.currentIndex + 1) % this.totalItems;
+        this.updateLayout();
+        this.updateDisplay();
+    }
+    
+    prev() {
+        // 循環到最後一張
+        this.currentIndex = (this.currentIndex - 1 + this.totalItems) % this.totalItems;
+        this.updateLayout();
+        this.updateDisplay();
+    }
+    
+    toggleAutoPlay() {
+        if (this.isAutoPlaying) {
+            this.stopAutoPlay();
+        } else {
+            this.startAutoPlay();
+        }
+    }
+    
+    startAutoPlay() {
+        this.isAutoPlaying = true;
+        this.autoPlayBtn.textContent = 'Pause';
+        this.autoPlayBtn.classList.remove('paused');
+        
+        this.autoPlayInterval = setInterval(() => {
+            this.next();
+        }, 3000);
+    }
+    
+    stopAutoPlay() {
+        this.isAutoPlaying = false;
+        this.autoPlayBtn.textContent = 'Auto Play';
+        this.autoPlayBtn.classList.add('paused');
+        
+        if (this.autoPlayInterval) {
+            clearInterval(this.autoPlayInterval);
+            this.autoPlayInterval = null;
+        }
+    }
+    
+    pauseAutoPlay() {
+        if (this.autoPlayInterval) {
+            clearInterval(this.autoPlayInterval);
+            this.autoPlayInterval = null;
+        }
+    }
+    
+    resumeAutoPlay() {
+        if (this.isAutoPlaying && !this.autoPlayInterval) {
+            this.autoPlayInterval = setInterval(() => {
+                this.next();
+            }, 3000);
+        }
+    }
+}
+
+// 圓餅圖類別
+class InventoryChart {
+    constructor() {
+        this.canvas = document.getElementById('inventoryChart');
+        this.legendContainer = document.getElementById('chartLegend');
+        this.chart = null;
+        
+        if (this.canvas) {
+            this.initChart();
+            this.updateStats();
+        }
+    }
+    
+    initChart() {
+        // 從 Django 模板獲取「所有存貨項目」數據
+        const items = [
+            {% for item in items %}
+            {
+                name: "{{ item.name|escapejs }}",
+                quantity: {{ item.quantity|default:0 }}, // 確保每個物品有 quantity 字段
+                hasImage: {% if item.image %}true{% else %}false{% endif %}
+            },
+            {% endfor %}
+        ];
+        
+        // 處理數據：每個存貨項目獨立顯示
+        const inventoryData = this.processInventoryData(items);
+        
+        // 如果沒有數據，顯示空狀態
+        if (items.length === 0) {
+            this.showEmptyState();
+            return;
+        }
+        
+        // 動態生成顏色 (每個存貨項目一個顏色)
+        const generateColors = (count) => {
+            const colorPalette = [
+                '#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f',
+                '#edc948', '#b07aa1', '#ff9da7', '#9c755f', '#bab0ac',
+                '#8cd17d', '#86bcb6', '#f1ce63', '#d37295', '#b3b3b3',
+                '#a0dbe8', '#fabfd2', '#d4a6c8', '#ffd700', '#a0e662'
+            ];
+            // 如果存貨項目超過顏色數量，循環使用
+            return Array.from({length: count}, (_, i) => colorPalette[i % colorPalette.length]);
+        };
+        
+        const ctx = this.canvas.getContext('2d');
+        this.chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: inventoryData.labels,
+                datasets: [{
+                    data: inventoryData.values,
+                    backgroundColor: generateColors(items.length),
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        display: false // 隱藏默認圖例，使用自定義圖例
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                return `${context.label}: ${context.raw} pcs`;
+                            }
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+        
+        this.createCustomLegend(inventoryData);
+    }
+    
+    processInventoryData(items) {
+        // 直接使用存貨項目名稱和數量
+        return {
+            labels: items.map(item => item.name),
+            values: items.map(item => item.quantity),
+            total: items.reduce((sum, item) => sum + item.quantity, 0)
+        };
+    }
+    
+    createCustomLegend(data) {
+        this.legendContainer.innerHTML = '';
+        
+        data.labels.forEach((label, i) => {
+            const value = data.values[i];
+            const color = this.chart.data.datasets[0].backgroundColor[i];
+            
+            const legendItem = document.createElement('div');
+            legendItem.className = 'legend-item';
+            legendItem.innerHTML = `
+                <span class="legend-color" style="background:${color}"></span>
+                <span class="legend-label">${label}</span>
+                <span class="legend-value">${value} pcs</span>
+            `;
+            this.legendContainer.appendChild(legendItem);
+        });
+    }
+    
+    showEmptyState() {
+        this.canvas.style.display = 'none';
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty-chart';
+        emptyDiv.innerHTML = `
+            <div class="empty-chart-icon">📦</div>
+            <p>No inventory data</p>
+        `;
+        this.canvas.parentElement.appendChild(emptyDiv);
+    }
+    
+    updateStats() {
+        // 從 DOM 直接獲取所有物品元素
+        const itemElements = document.querySelectorAll('.carousel-item');
+        let totalQuantity = 0;
+        let itemsWithImages = 0;
+        let itemsWithoutImages = 0;
+
+        // 從 Django 模板變量獲取原始數據
+        const items = [
+            {% for item in items %}
+            {
+                name: "{{ item.name|escapejs }}",
+                quantity: {{ item.quantity|default:0 }},
+                hasImage: {% if item.image %}true{% else %}false{% endif %}
+            },
+            {% endfor %}
+        ];
+
+        // 計算統計數據
+        items.forEach(item => {
+            totalQuantity += item.quantity;
+            if (item.hasImage) {
+                itemsWithImages++;
+            } else {
+                itemsWithoutImages++;
+            }
+        });
+
+        const completionRate = items.length > 0 
+            ? Math.round((itemsWithImages / items.length) * 100) 
+            : 0;
+
+        // 更新 DOM
+        document.getElementById('totalQuantity').textContent = totalQuantity;
+        document.getElementById('itemsWithImages').textContent = itemsWithImages;
+        document.getElementById('itemsWithoutImages').textContent = itemsWithoutImages;
+        document.getElementById('completionRate').textContent = `${completionRate}%`;
+    }
+}
+
+// 圖片載入錯誤處理
+function handleImageError(img) {
+    const container = img.parentElement;
+    const itemName = container.querySelector('.item-name').textContent;
+    
+    img.style.display = 'none';
+    
+    const noImageDiv = document.createElement('div');
+    noImageDiv.className = 'no-image';
+    noImageDiv.innerHTML = `
+        <div class="no-image-icon">❌</div>
+        <p>Image load failed</p>
+    `;
+    
+    container.appendChild(noImageDiv);
+}
+
+// 初始化
+let carousel;
+let inventoryChart;
+
+document.addEventListener('DOMContentLoaded', function() {
+    carousel = new HorizontalCarousel();
+    inventoryChart = new InventoryChart();
+});
+</script>
+
+{% endblock %}

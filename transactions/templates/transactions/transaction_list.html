@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_title %}
+Sales Records
+{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'transactions:transaction_create' %}" class="btn btn-add">Add Transaction</a>
+<button type="button" class="btn btn-export" data-bs-toggle="modal" data-bs-target="#exportModal">Export</button>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/transactions.css' %}">
+
+<div class="transactions-header">
+    <div class="transtions-actions">
+        <form method="get" action="" class="search-form">
+            <input type="text" name="query" value="{{ query|default_if_none:'' }}" 
+                placeholder="Search by anything..." class="search-input">
+            <button type="submit" class="btn btn-search">Search</button>            
+        </form>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="transactions-table">
+        <thead>
+            <tr>
+                <th class="sortable">
+                    Item
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=item" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-item" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Unit Price
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=unitprice" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-unitprice" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Quantity
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=quantity" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-quantity" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Date
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=timestamp" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-timestamp" class="sort-link">↓</a>
+                </th>
+                <th class="sortable">
+                    Demander
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=demander" class="sort-link">↑</a>
+                    <a href="?{% if query %}query={{ query }}&{% endif %}sort=-demander" class="sort-link">↓</a>
+                </th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.item.name }}</td>
+                <td class="amount-cell">${{ transaction.unitprice }}</td>
+                <td class="quantity-cell">{{ transaction.quantity }}</td>
+                <td class="timestamp-cell">{{ transaction.timestamp|date:"Y-m-d" }}</td>
+                <td>{{ transaction.demander }}</td>
+                <td>{{ transaction.notes }}</td>
+            </tr>
+            {% empty %}
+            <tr class="no-records">
+                <td colspan="6">
+                    No transactions found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Export Modal -->
+<div class="modal fade export-modal" id="exportModal" data-bs-backdrop="static" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Export Transactions</h5>                
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm" method="post" action="{% url 'transactions:export_csv' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Export Range:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="date_range" id="allData" value="all" checked>
+                            <label class="form-check-label" for="allData">All Data</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="date_range" id="specificDay" value="day">
+                            <label class="form-check-label" for="specificDay">Specific Day</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="date_range" id="specificMonth" value="month">
+                            <label class="form-check-label" for="specificMonth">Specific Month</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="date_range" id="specificYear" value="year">
+                            <label class="form-check-label" for="specificYear">Specific Year</label>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="customDate" class="form-label">Select Date:</label>
+                        <input type="date" class="form-control" id="customDate" name="custom_date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="exportForm" class="btn btn-primary">Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+  // 根據選擇的日期範圍啟用/禁用日期輸入
+  document.querySelectorAll('input[name="date_range"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const dateInput = document.getElementById('customDate');
+      if (this.value === 'all') {
+        dateInput.disabled = true;
+      } else {
+        dateInput.disabled = false;
+      }
+    });
+  });
+
+  // 初始狀態
+  document.getElementById('customDate').disabled = true;
+</script>
+
+{% endblock %}

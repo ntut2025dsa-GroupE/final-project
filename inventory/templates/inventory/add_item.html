@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+
+<div class="form-container">
+    <h1 class="form-title">Add New Item</h1>
+
+    <form method="post" class="item-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Main form fields -->
+        <div class="form-card">
+            {% for field in form %}
+            <div class="form-group {% if field.errors %}has-error{% endif %}">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="form-help">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="form-error">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-save">Add</button>
+            <a href="{% url 'inventory:item_list' %}" class="btn btn-back">Back</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

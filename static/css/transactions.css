@@ -1,0 +1,193 @@
+/* ===== Transactions Page Styles ===== */
+
+/* Page Header */
+.transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.transactions-header h1 {
+    color: var(--primary-color);
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.transactions-actions {
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+/* Search Form */
+.search-form {
+    display: flex;
+    gap: var(--space-sm);
+    min-width: 300px;
+}
+
+.search-input {
+    flex: 1;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--gray-color);
+    border-radius: var(--radius-sm);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: var(--secondary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Buttons */
+.btn-add {
+    background-color: var(--success-color);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.btn-add:hover {
+    background-color: #219653;
+}
+
+.btn-export {
+    background-color: #f39c12;
+    color: var(--dark-color);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.btn-export:hover {
+    background-color: #e67e22;
+    color: white;
+}
+
+.btn-search {
+    background-color: var(--secondary-color);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Transactions Table */
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.transactions-table th {
+    background-color: #f39c12;
+    color: var(--dark-color);
+    padding: var(--space-md);
+    text-align: left;
+    position: sticky;
+    top: 0;
+}
+
+.transactions-table td {
+    padding: var(--space-md);
+    border-bottom: 1px solid #eee;
+}
+
+.transactions-table tr:last-child td {
+    border-bottom: none;
+}
+
+.transactions-table tr:hover {
+    background-color: #f8fafc;
+}
+
+/* 針對模態框的特殊處理 */
+body .modal-content {
+  border-radius: var(--radius-lg);
+  border: none;
+  box-shadow: var(--shadow-lg);
+}
+
+body .modal-header {
+  background-color: var(--secondary-color);
+  color: white;
+  border-bottom: none;
+}
+
+body .modal-body {
+  padding: var(--space-lg);
+}
+
+body .form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+  border-color: var(--secondary-color);
+}
+
+/* Table Cells */
+.amount-cell {
+    font-weight: 600;
+    color: var(--success-color);
+}
+
+.quantity-cell {
+    font-weight: 600;
+}
+
+.timestamp-cell {
+    color: var(--gray-color);
+    font-size: 0.85em;
+}
+
+/* Sort Links */
+.sort-link {
+    color: rgba(0, 0, 0, 0.7);
+    margin-left: var(--space-xs);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.sort-link:hover {
+    color: var(--dark-color);
+}
+
+/* Export Modal */
+.export-modal .modal-header {
+    background-color: #f39c12;
+    color: var(--dark-color);
+}
+
+.export-modal .btn-close {
+    filter: invert(1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .transactions-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .transactions-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .search-form {
+        width: 100%;
+    }
+    
+    .transactions-table {
+        display: block;
+        overflow-x: auto;
+    }
+}
