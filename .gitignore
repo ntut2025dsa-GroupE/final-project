@@ -17,6 +17,7 @@ local_settings.py
 # Virtual Environments
 env/
 venv/
+.venv/
 ENV/
 VENV/
 

@@ -48,14 +48,5 @@ class Transaction(models.Model):
     def __repr__(self):
         return f"Transaction(id={self.id}, item='{self.item.name}', quantity={self.quantity})"
 
-class StockIn(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    unitcost = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.IntegerField()
-    last_vendor = models.CharField(max_length=100)
-    created_at = models.DateField()
-    expiry_date = models.DateField(null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.item.name} - {self.quantity} pcs at {self.unitcost}"
 
